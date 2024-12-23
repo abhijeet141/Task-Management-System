@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = './proto/generated';
+
+package proto;
+
+import "proto/task.proto";
+
+message TaskList{
+    repeated Task Task = 1;
+}

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = './proto/generated';
+
+package proto;
+
+import "proto/task.proto";
+import "proto/no_param.proto";
+import "proto/message.proto";
+import "proto/task_id.proto";
+
+service TaskManagementService{
+    rpc CreateTask (Task) returns (Message);
+    rpc CreateTasks (stream Task) returns (Message);
+    rpc CreateTaskList (stream Task) returns (stream Task);
+    rpc GetAllTask (NoParam) returns (stream Task);
+    rpc GetTaskById (TaskId) returns (Task);
+    rpc UpdateTaskById (TaskId) returns (Task);
+    rpc DeleteTaskById (TaskId) returns (Message);
+}

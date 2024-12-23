@@ -35,7 +35,7 @@ type TaskManagementServiceClient interface {
 	CreateTask(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Message, error)
 	CreateTasks(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[Task, Message], error)
 	CreateTaskList(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Task, Task], error)
-	GetAllTask(ctx context.Context, in *NoParam, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Task], error)
+	GetAllTask(ctx context.Context, in *NoParam, opts ...grpc.CallOption) (*TaskList, error)
 	GetTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
 	UpdateTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
 	DeleteTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Message, error)
@@ -85,24 +85,15 @@ func (c *taskManagementServiceClient) CreateTaskList(ctx context.Context, opts .
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type TaskManagementService_CreateTaskListClient = grpc.BidiStreamingClient[Task, Task]
 
-func (c *taskManagementServiceClient) GetAllTask(ctx context.Context, in *NoParam, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Task], error) {
+func (c *taskManagementServiceClient) GetAllTask(ctx context.Context, in *NoParam, opts ...grpc.CallOption) (*TaskList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &TaskManagementService_ServiceDesc.Streams[2], TaskManagementService_GetAllTask_FullMethodName, cOpts...)
+	out := new(TaskList)
+	err := c.cc.Invoke(ctx, TaskManagementService_GetAllTask_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[NoParam, Task]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type TaskManagementService_GetAllTaskClient = grpc.ServerStreamingClient[Task]
 
 func (c *taskManagementServiceClient) GetTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -141,7 +132,7 @@ type TaskManagementServiceServer interface {
 	CreateTask(context.Context, *Task) (*Message, error)
 	CreateTasks(grpc.ClientStreamingServer[Task, Message]) error
 	CreateTaskList(grpc.BidiStreamingServer[Task, Task]) error
-	GetAllTask(*NoParam, grpc.ServerStreamingServer[Task]) error
+	GetAllTask(context.Context, *NoParam) (*TaskList, error)
 	GetTaskById(context.Context, *TaskId) (*Task, error)
 	UpdateTaskById(context.Context, *TaskId) (*Task, error)
 	DeleteTaskById(context.Context, *TaskId) (*Message, error)
@@ -164,8 +155,8 @@ func (UnimplementedTaskManagementServiceServer) CreateTasks(grpc.ClientStreaming
 func (UnimplementedTaskManagementServiceServer) CreateTaskList(grpc.BidiStreamingServer[Task, Task]) error {
 	return status.Errorf(codes.Unimplemented, "method CreateTaskList not implemented")
 }
-func (UnimplementedTaskManagementServiceServer) GetAllTask(*NoParam, grpc.ServerStreamingServer[Task]) error {
-	return status.Errorf(codes.Unimplemented, "method GetAllTask not implemented")
+func (UnimplementedTaskManagementServiceServer) GetAllTask(context.Context, *NoParam) (*TaskList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllTask not implemented")
 }
 func (UnimplementedTaskManagementServiceServer) GetTaskById(context.Context, *TaskId) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTaskById not implemented")
@@ -229,16 +220,23 @@ func _TaskManagementService_CreateTaskList_Handler(srv interface{}, stream grpc.
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type TaskManagementService_CreateTaskListServer = grpc.BidiStreamingServer[Task, Task]
 
-func _TaskManagementService_GetAllTask_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(NoParam)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _TaskManagementService_GetAllTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NoParam)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(TaskManagementServiceServer).GetAllTask(m, &grpc.GenericServerStream[NoParam, Task]{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(TaskManagementServiceServer).GetAllTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskManagementService_GetAllTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskManagementServiceServer).GetAllTask(ctx, req.(*NoParam))
+	}
+	return interceptor(ctx, in, info, handler)
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type TaskManagementService_GetAllTaskServer = grpc.ServerStreamingServer[Task]
 
 func _TaskManagementService_GetTaskById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TaskId)
@@ -306,6 +304,10 @@ var TaskManagementService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TaskManagementService_CreateTask_Handler,
 		},
 		{
+			MethodName: "GetAllTask",
+			Handler:    _TaskManagementService_GetAllTask_Handler,
+		},
+		{
 			MethodName: "GetTaskById",
 			Handler:    _TaskManagementService_GetTaskById_Handler,
 		},
@@ -329,11 +331,6 @@ var TaskManagementService_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _TaskManagementService_CreateTaskList_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
-		},
-		{
-			StreamName:    "GetAllTask",
-			Handler:       _TaskManagementService_GetAllTask_Handler,
-			ServerStreams: true,
 		},
 	},
 	Metadata: "proto/task_management.proto",

@@ -24,12 +24,24 @@ func GetTasksController(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Server error: %v", err)
 	}
 	tasks := map[string]interface{}{}
+	istLocation, err := time.LoadLocation("Asia/Kolkata")
+	if err != nil {
+		http.Error(w, "error loading location %v", http.StatusInternalServerError)
+		return
+	}
+
 	for _, task := range res.Task {
+		createdTime := task.CreatedAt.AsTime().In(istLocation).Format("2006-01-02 15:04:05")
+		parsedTime, err := time.Parse("2006-01-02 15:04:05", createdTime)
+		if err != nil {
+			http.Error(w, "error parsing formatted time", http.StatusInternalServerError)
+			return
+		}
 		tasks[fmt.Sprintf("%d", task.Id)] = map[string]interface{}{
 			"title":       task.Title,
 			"description": task.Description,
 			"status":      task.Status,
-			"created_at":  task.CreatedAt.AsTime().Format("2006-01-02 15:04:05"),
+			"created_at":  parsedTime,
 		}
 	}
 	response, err := json.MarshalIndent(tasks, "", "\t")

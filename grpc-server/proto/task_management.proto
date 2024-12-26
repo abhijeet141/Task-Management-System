@@ -9,6 +9,9 @@ import "proto/no_param.proto";
 import "proto/message.proto";
 import "proto/task_id.proto";
 import "proto/task_list.proto";
+import "proto/user.proto";
+import "proto/user_info.proto";
+
 
 service TaskManagementService{
     rpc CreateTask (Task) returns (Message);
@@ -18,4 +21,6 @@ service TaskManagementService{
     rpc GetTaskById (TaskId) returns (Task);
     rpc UpdateTaskById (Task) returns (Task);
     rpc DeleteTaskById (TaskId) returns (Message);
+    rpc UserLogin (UserInfo) returns (Message);
+    rpc UserRegister (User) returns (Message);
 }

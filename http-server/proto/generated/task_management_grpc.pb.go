@@ -26,6 +26,8 @@ const (
 	TaskManagementService_GetTaskById_FullMethodName    = "/proto.TaskManagementService/GetTaskById"
 	TaskManagementService_UpdateTaskById_FullMethodName = "/proto.TaskManagementService/UpdateTaskById"
 	TaskManagementService_DeleteTaskById_FullMethodName = "/proto.TaskManagementService/DeleteTaskById"
+	TaskManagementService_UserLogin_FullMethodName      = "/proto.TaskManagementService/UserLogin"
+	TaskManagementService_UserRegister_FullMethodName   = "/proto.TaskManagementService/UserRegister"
 )
 
 // TaskManagementServiceClient is the client API for TaskManagementService service.
@@ -39,6 +41,8 @@ type TaskManagementServiceClient interface {
 	GetTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
 	UpdateTaskById(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Task, error)
 	DeleteTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Message, error)
+	UserLogin(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*Message, error)
+	UserRegister(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
 }
 
 type taskManagementServiceClient struct {
@@ -125,6 +129,26 @@ func (c *taskManagementServiceClient) DeleteTaskById(ctx context.Context, in *Ta
 	return out, nil
 }
 
+func (c *taskManagementServiceClient) UserLogin(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*Message, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Message)
+	err := c.cc.Invoke(ctx, TaskManagementService_UserLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskManagementServiceClient) UserRegister(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Message)
+	err := c.cc.Invoke(ctx, TaskManagementService_UserRegister_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskManagementServiceServer is the server API for TaskManagementService service.
 // All implementations must embed UnimplementedTaskManagementServiceServer
 // for forward compatibility.
@@ -136,6 +160,8 @@ type TaskManagementServiceServer interface {
 	GetTaskById(context.Context, *TaskId) (*Task, error)
 	UpdateTaskById(context.Context, *Task) (*Task, error)
 	DeleteTaskById(context.Context, *TaskId) (*Message, error)
+	UserLogin(context.Context, *UserInfo) (*Message, error)
+	UserRegister(context.Context, *User) (*Message, error)
 	mustEmbedUnimplementedTaskManagementServiceServer()
 }
 
@@ -166,6 +192,12 @@ func (UnimplementedTaskManagementServiceServer) UpdateTaskById(context.Context, 
 }
 func (UnimplementedTaskManagementServiceServer) DeleteTaskById(context.Context, *TaskId) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTaskById not implemented")
+}
+func (UnimplementedTaskManagementServiceServer) UserLogin(context.Context, *UserInfo) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserLogin not implemented")
+}
+func (UnimplementedTaskManagementServiceServer) UserRegister(context.Context, *User) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserRegister not implemented")
 }
 func (UnimplementedTaskManagementServiceServer) mustEmbedUnimplementedTaskManagementServiceServer() {}
 func (UnimplementedTaskManagementServiceServer) testEmbeddedByValue()                               {}
@@ -292,6 +324,42 @@ func _TaskManagementService_DeleteTaskById_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskManagementService_UserLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskManagementServiceServer).UserLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskManagementService_UserLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskManagementServiceServer).UserLogin(ctx, req.(*UserInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskManagementService_UserRegister_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskManagementServiceServer).UserRegister(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskManagementService_UserRegister_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskManagementServiceServer).UserRegister(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskManagementService_ServiceDesc is the grpc.ServiceDesc for TaskManagementService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -318,6 +386,14 @@ var TaskManagementService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTaskById",
 			Handler:    _TaskManagementService_DeleteTaskById_Handler,
+		},
+		{
+			MethodName: "UserLogin",
+			Handler:    _TaskManagementService_UserLogin_Handler,
+		},
+		{
+			MethodName: "UserRegister",
+			Handler:    _TaskManagementService_UserRegister_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

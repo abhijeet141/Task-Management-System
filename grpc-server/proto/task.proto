@@ -9,8 +9,9 @@ import "google/protobuf/timestamp.proto";
 
 message Task {
     uint64 Id = 1;                                      // @gotags: orm:"pk;column(id);auto"                        json:"id"
-    string Title = 2;                                   // @gotags: orm:"column(title)"                             json:"title"
-    string Description = 3;                             // @gotags: orm:"column(description)"                       json:"description"
-    string Status = 4;                                  // @gotags: orm:"column(status)"                            json:"status"
-    google.protobuf.Timestamp createdAt = 5;            // @gotags: orm:"column(created_at);timestamp"              json:"created_at"
+    uint64 userId = 2;                                  // @gotags: orm:"column(user_id)"                           json:"user_id"
+    string Title = 3;                                   // @gotags: orm:"column(title)"                             json:"title"
+    string Description = 4;                             // @gotags: orm:"column(description)"                       json:"description"
+    string Status = 5;                                  // @gotags: orm:"column(status)"                            json:"status"
+    google.protobuf.Timestamp createdAt = 6;            // @gotags: orm:"column(created_at);timestamp"              json:"created_at"
 }

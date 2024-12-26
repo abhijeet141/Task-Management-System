@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = './proto/generated';
+
+package proto;
+
+import "google/protobuf/timestamp.proto";
+
+
+message User{
+    uint64 Id = 1;                                    // @gotags: orm:"pk;column(id);auto"                      json:"id"
+    string firstName = 2;                             // @gotags: orm:"column(first_name)"                      json:"firstName"
+    string lastName = 3;                              // @gotags: orm:"column(last_name)"                       json:"lastName"
+    string emailAddress = 4;                          // @gotags: orm:"column(email_address);UNIQUE"                   json:"emailAddress"
+    string password = 5;                              // @gotags: orm:"column(password)"                        json:"password"
+    google.protobuf.Timestamp createdAt = 6;          // @gotags: orm:"column(created_at);type(datetime)"       json:"craetedAt"
+}

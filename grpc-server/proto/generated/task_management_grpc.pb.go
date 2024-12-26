@@ -37,7 +37,7 @@ type TaskManagementServiceClient interface {
 	CreateTaskList(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Task, Task], error)
 	GetAllTask(ctx context.Context, in *NoParam, opts ...grpc.CallOption) (*TaskList, error)
 	GetTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
-	UpdateTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
+	UpdateTaskById(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Task, error)
 	DeleteTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Message, error)
 }
 
@@ -105,7 +105,7 @@ func (c *taskManagementServiceClient) GetTaskById(ctx context.Context, in *TaskI
 	return out, nil
 }
 
-func (c *taskManagementServiceClient) UpdateTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error) {
+func (c *taskManagementServiceClient) UpdateTaskById(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Task, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Task)
 	err := c.cc.Invoke(ctx, TaskManagementService_UpdateTaskById_FullMethodName, in, out, cOpts...)
@@ -134,7 +134,7 @@ type TaskManagementServiceServer interface {
 	CreateTaskList(grpc.BidiStreamingServer[Task, Task]) error
 	GetAllTask(context.Context, *NoParam) (*TaskList, error)
 	GetTaskById(context.Context, *TaskId) (*Task, error)
-	UpdateTaskById(context.Context, *TaskId) (*Task, error)
+	UpdateTaskById(context.Context, *Task) (*Task, error)
 	DeleteTaskById(context.Context, *TaskId) (*Message, error)
 	mustEmbedUnimplementedTaskManagementServiceServer()
 }
@@ -161,7 +161,7 @@ func (UnimplementedTaskManagementServiceServer) GetAllTask(context.Context, *NoP
 func (UnimplementedTaskManagementServiceServer) GetTaskById(context.Context, *TaskId) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTaskById not implemented")
 }
-func (UnimplementedTaskManagementServiceServer) UpdateTaskById(context.Context, *TaskId) (*Task, error) {
+func (UnimplementedTaskManagementServiceServer) UpdateTaskById(context.Context, *Task) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTaskById not implemented")
 }
 func (UnimplementedTaskManagementServiceServer) DeleteTaskById(context.Context, *TaskId) (*Message, error) {
@@ -257,7 +257,7 @@ func _TaskManagementService_GetTaskById_Handler(srv interface{}, ctx context.Con
 }
 
 func _TaskManagementService_UpdateTaskById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TaskId)
+	in := new(Task)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func _TaskManagementService_UpdateTaskById_Handler(srv interface{}, ctx context.
 		FullMethod: TaskManagementService_UpdateTaskById_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TaskManagementServiceServer).UpdateTaskById(ctx, req.(*TaskId))
+		return srv.(TaskManagementServiceServer).UpdateTaskById(ctx, req.(*Task))
 	}
 	return interceptor(ctx, in, info, handler)
 }

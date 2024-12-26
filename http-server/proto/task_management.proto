@@ -17,6 +17,6 @@ service TaskManagementService{
     rpc CreateTaskList (stream Task) returns (stream Task);
     rpc GetAllTask (NoParam) returns (TaskList);
     rpc GetTaskById (TaskId) returns (Task);
-    rpc UpdateTaskById (TaskId) returns (Task);
+    rpc UpdateTaskById (Task) returns (Task);
     rpc DeleteTaskById (TaskId) returns (Message);
 }

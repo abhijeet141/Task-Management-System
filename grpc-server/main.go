@@ -22,8 +22,17 @@ type TaskManagementServer struct {
 	pb.TaskManagementServiceServer
 }
 
+type User struct {
+	Id           int       `orm:"column(id);auto"`
+	FirstName    string    `orm:"column(first_name)"`
+	LastName     string    `orm:"column(last_name)"`
+	EmailAddress string    `orm:"column(email_address)"`
+	Password     string    `orm:"column(password)"`
+	CreatedAt    time.Time `orm:"column(created_at);type(datetime)"`
+}
 type Task struct {
 	Id          int       `orm:"column(id);auto"`
+	UserId      int       `orm:"column(user_id)"`
 	Title       string    `orm:"column(title)"`
 	Description string    `orm:"column(description)"`
 	Status      string    `orm:"column(status)"`
@@ -31,7 +40,7 @@ type Task struct {
 }
 
 func init() {
-	orm.RegisterModel(new(Task))
+	orm.RegisterModel(new(Task), new(User))
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)

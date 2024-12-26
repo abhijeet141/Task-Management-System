@@ -33,6 +33,7 @@ func (t *TaskManagementServer) CreateTask(ctx context.Context, req *pb.Task) (*p
 		Description: req.Description,
 		Status:      req.Status,
 		CreatedAt:   parsedTime,
+		UserId:      int(req.UserId),
 	}
 	_, err = o.Insert(&dbTask)
 	if err != nil {

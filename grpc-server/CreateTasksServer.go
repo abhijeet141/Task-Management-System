@@ -47,6 +47,7 @@ func (t *TaskManagementServer) CreateTasks(stream pb.TaskManagementService_Creat
 			Description: req.Description,
 			Status:      req.Status,
 			CreatedAt:   parsedTime,
+			UserId:      int(req.UserId),
 		}
 
 		_, err = o.Insert(&dbTask)

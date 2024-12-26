@@ -28,6 +28,7 @@ func CreateTasksController(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, task := range tasks.Task {
 		err := stream.Send(&pb.Task{
+			UserId:      task.UserId,
 			Title:       task.Title,
 			Description: task.Description,
 			Status:      task.Status,

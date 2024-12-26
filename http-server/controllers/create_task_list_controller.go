@@ -66,6 +66,7 @@ func CreateTaskListController(w http.ResponseWriter, r *http.Request) {
 				"description": res.Description,
 				"status":      res.Status,
 				"created_at":  parsedTime,
+				"user_id":     res.UserId,
 			}
 			TaskId++
 			m.Unlock()
@@ -73,6 +74,7 @@ func CreateTaskListController(w http.ResponseWriter, r *http.Request) {
 	}()
 	for _, task := range tasks.Task {
 		err := stream.Send(&pb.Task{
+			UserId:      task.UserId,
 			Title:       task.Title,
 			Description: task.Description,
 			Status:      task.Status,

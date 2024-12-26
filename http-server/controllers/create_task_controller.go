@@ -18,6 +18,7 @@ func CreateTaskController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	taskItem := &pb.Task{
+		UserId:      task.UserId,
 		Title:       task.Title,
 		Description: task.Description,
 		Status:      task.Status,

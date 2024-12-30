@@ -14,7 +14,7 @@ func SetupRouter() *mux.Router {
 
 	userRouter.HandleFunc("/register", controllers.RegisterUserController).Methods("POST")
 	userRouter.HandleFunc("/login", controllers.LoginUserController).Methods("POST")
-
+	userRouter.HandleFunc("/refresh-token", controllers.RefreshTokenController).Methods("GET")
 	authenticatedRouter := userRouter.PathPrefix("").Subrouter()
 	authenticatedRouter.Use(middleware.AuthMiddleware)
 

@@ -40,3 +40,5 @@
 [INFO] 2024/12/30 19:59:25 Method /proto.TaskManagementService/UserLogin succeeded with response: message:"Login successful"
 [INFO] 2024/12/30 19:59:33 Calling method: /proto.TaskManagementService/UserLogin with request: userName:"jane.smith@example.com" password:"mypassword456"
 [INFO] 2024/12/30 19:59:33 Method /proto.TaskManagementService/UserLogin succeeded with response: message:"Login successful"
+[INFO] 2024/12/30 21:02:15 Calling method: /proto.TaskManagementService/UserLogin with request: userName:"jane.smith@example.com"  password:"mypassword456"
+[INFO] 2024/12/30 21:02:15 Method /proto.TaskManagementService/UserLogin succeeded with response: message:"Login successful"

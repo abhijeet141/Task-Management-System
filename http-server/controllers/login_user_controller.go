@@ -32,7 +32,7 @@ func init() {
 func GenerateJWT(userName string) (string, error) {
 	claims := jwt.MapClaims{
 		"username": userName,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"exp":      time.Now().Add(time.Hour * 1).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(jwtSecret)
@@ -41,7 +41,18 @@ func GenerateJWT(userName string) (string, error) {
 	}
 	return tokenString, nil
 }
-
+func GenerateRefresh(userName string) (string, error) {
+	claims := jwt.MapClaims{
+		"username": userName,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	refreshtoken, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return "", fmt.Errorf("could not sign the refresh token: %v", err)
+	}
+	return refreshtoken, nil
+}
 func LoginUserController(w http.ResponseWriter, r *http.Request) {
 	var userInfo pb.UserInfo
 	err := json.NewDecoder(r.Body).Decode(&userInfo)
@@ -65,12 +76,17 @@ func LoginUserController(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid login", http.StatusUnauthorized)
 		return
 	}
-	token, err := GenerateJWT(userInfo.UserName)
+	access_token, err := GenerateJWT(userInfo.UserName)
 	if err != nil {
-		http.Error(w, "Error generating token", http.StatusInternalServerError)
+		http.Error(w, "Error generating access token", http.StatusInternalServerError)
+		return
+	}
+	refresh_token, err := GenerateRefresh(userDetails.UserName)
+	if err != nil {
+		http.Error(w, "Error generating refresh token", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"JWT Token": token})
+	json.NewEncoder(w).Encode(map[string]string{"Access Token": access_token, "Refresh Token": refresh_token})
 }

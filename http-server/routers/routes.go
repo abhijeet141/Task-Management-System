@@ -15,14 +15,17 @@ func SetupRouter() *mux.Router {
 	userRouter.HandleFunc("/register", controllers.RegisterUserController).Methods("POST")
 	userRouter.HandleFunc("/login", controllers.LoginUserController).Methods("POST")
 
-	userRouter.Use(middleware.AuthMiddleware)
+	authenticatedRouter := userRouter.PathPrefix("").Subrouter()
+	authenticatedRouter.Use(middleware.AuthMiddleware)
 
-	userRouter.HandleFunc("/task/{id}", controllers.GetTaskByIdController).Methods("GET")
-	userRouter.HandleFunc("/tasks", controllers.GetTasksController).Methods("GET")
-	userRouter.HandleFunc("/tasks", controllers.CreateTaskListController).Methods("POST")
-	userRouter.HandleFunc("/task", controllers.CreateTaskController).Methods("POST")
-	userRouter.HandleFunc("/tasks", controllers.CreateTasksController).Methods("POST")
-	userRouter.HandleFunc("/task/{id}", controllers.DeleteTaskByIdController).Methods("DELETE")
-	userRouter.HandleFunc("/task/{id}", controllers.UpdateTaskByIdController).Methods("PUT")
+	authenticatedRouter.HandleFunc("/task/{id}", controllers.GetTaskByIdController).Methods("GET")
+	authenticatedRouter.HandleFunc("/tasks", controllers.GetTasksController).Methods("GET")
+	authenticatedRouter.HandleFunc("/tasks", controllers.CreateTaskListController).Methods("POST")
+	authenticatedRouter.HandleFunc("/task", controllers.CreateTaskController).Methods("POST")
+	authenticatedRouter.HandleFunc("/tasks", controllers.CreateTasksController).Methods("POST")
+	authenticatedRouter.HandleFunc("/task/{id}", controllers.DeleteTaskByIdController).Methods("DELETE")
+	authenticatedRouter.HandleFunc("/task/{id}", controllers.UpdateTaskByIdController).Methods("PUT")
+
+	authenticatedRouter.HandleFunc("/task/sort/{sortBy}", controllers.SortTasksControllers).Methods("GET")
 	return router
 }

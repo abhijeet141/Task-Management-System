@@ -1,6 +1,7 @@
 package grpcclient
 
 import (
+	"github/http-server/Interceptor"
 	pb "github/http-server/proto/generated"
 	"log"
 
@@ -13,7 +14,7 @@ const (
 )
 
 func TaskManagementClient() (pb.TaskManagementServiceClient, error) {
-	conn, err := grpc.NewClient("localhost"+PORT, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("localhost"+PORT, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithUnaryInterceptor(Interceptor.UnaryClientInterceptor), grpc.WithStreamInterceptor(Interceptor.StreamClientInterceptor))
 	if err != nil {
 		log.Fatalf("Did not connect %v", err)
 	}

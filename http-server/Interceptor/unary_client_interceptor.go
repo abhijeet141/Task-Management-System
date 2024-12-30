@@ -1,27 +1,39 @@
-package interceptor
+package Interceptor
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"strings"
+	"os"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
-func UnaryClientInterceptor(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	token := r.Header.Get("Authorization")
-	if token == "" || !strings.HasPrefix(token, "Bearer ") {
-		return fmt.Errorf("Invalid Authorization Header")
+var InfoLog *log.Logger
+var ErrorLog *log.Logger
+
+func init() {
+	file, err := os.OpenFile("Logging/debug.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		log.Fatalf("Error opening file:%v", err)
 	}
-	tokenId := strings.TrimPrefix(token, "Bearer ")
-	ctx = metadata.AppendToOutgoingContext(ctx, "tokenId", tokenId)
+	InfoLog = log.New(file, "[INFO] ", log.LstdFlags)
+	ErrorLog = log.New(file, "[ERROR] ", log.LstdFlags)
+}
+
+func UnaryClientInterceptor(ctx context.Context,
+	method string,
+	req, reply interface{},
+	cc *grpc.ClientConn,
+	invoker grpc.UnaryInvoker,
+	opts ...grpc.CallOption) error {
+
+	InfoLog.Printf("Calling method: %s with request: %v", method, req)
+
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	if err != nil {
-		log.Printf("failed: %v", err)
+		ErrorLog.Printf("Method %s failed with error: %v", method, err)
 	} else {
-		log.Printf("Response received: %v", reply)
+		InfoLog.Printf("Method %s succeeded with response: %v", method, reply)
 	}
 	return err
 }

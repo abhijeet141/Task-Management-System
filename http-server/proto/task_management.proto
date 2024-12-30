@@ -11,7 +11,7 @@ import "proto/task_id.proto";
 import "proto/task_list.proto";
 import "proto/user.proto";
 import "proto/user_info.proto";
-
+import "proto/sort_task.proto";
 
 service TaskManagementService{
     rpc CreateTask (Task) returns (Message);
@@ -23,4 +23,5 @@ service TaskManagementService{
     rpc DeleteTaskById (TaskId) returns (Message);
     rpc UserLogin (UserInfo) returns (Message);
     rpc UserRegister (User) returns (Message);
+    rpc SortTasks(SortTasksRequest) returns (TaskList);
 }

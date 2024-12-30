@@ -28,6 +28,7 @@ const (
 	TaskManagementService_DeleteTaskById_FullMethodName = "/proto.TaskManagementService/DeleteTaskById"
 	TaskManagementService_UserLogin_FullMethodName      = "/proto.TaskManagementService/UserLogin"
 	TaskManagementService_UserRegister_FullMethodName   = "/proto.TaskManagementService/UserRegister"
+	TaskManagementService_SortTasks_FullMethodName      = "/proto.TaskManagementService/SortTasks"
 )
 
 // TaskManagementServiceClient is the client API for TaskManagementService service.
@@ -43,6 +44,7 @@ type TaskManagementServiceClient interface {
 	DeleteTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Message, error)
 	UserLogin(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*Message, error)
 	UserRegister(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
+	SortTasks(ctx context.Context, in *SortTasksRequest, opts ...grpc.CallOption) (*TaskList, error)
 }
 
 type taskManagementServiceClient struct {
@@ -149,6 +151,16 @@ func (c *taskManagementServiceClient) UserRegister(ctx context.Context, in *User
 	return out, nil
 }
 
+func (c *taskManagementServiceClient) SortTasks(ctx context.Context, in *SortTasksRequest, opts ...grpc.CallOption) (*TaskList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TaskList)
+	err := c.cc.Invoke(ctx, TaskManagementService_SortTasks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskManagementServiceServer is the server API for TaskManagementService service.
 // All implementations must embed UnimplementedTaskManagementServiceServer
 // for forward compatibility.
@@ -162,6 +174,7 @@ type TaskManagementServiceServer interface {
 	DeleteTaskById(context.Context, *TaskId) (*Message, error)
 	UserLogin(context.Context, *UserInfo) (*Message, error)
 	UserRegister(context.Context, *User) (*Message, error)
+	SortTasks(context.Context, *SortTasksRequest) (*TaskList, error)
 	mustEmbedUnimplementedTaskManagementServiceServer()
 }
 
@@ -198,6 +211,9 @@ func (UnimplementedTaskManagementServiceServer) UserLogin(context.Context, *User
 }
 func (UnimplementedTaskManagementServiceServer) UserRegister(context.Context, *User) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserRegister not implemented")
+}
+func (UnimplementedTaskManagementServiceServer) SortTasks(context.Context, *SortTasksRequest) (*TaskList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SortTasks not implemented")
 }
 func (UnimplementedTaskManagementServiceServer) mustEmbedUnimplementedTaskManagementServiceServer() {}
 func (UnimplementedTaskManagementServiceServer) testEmbeddedByValue()                               {}
@@ -360,6 +376,24 @@ func _TaskManagementService_UserRegister_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskManagementService_SortTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SortTasksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskManagementServiceServer).SortTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskManagementService_SortTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskManagementServiceServer).SortTasks(ctx, req.(*SortTasksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskManagementService_ServiceDesc is the grpc.ServiceDesc for TaskManagementService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -394,6 +428,10 @@ var TaskManagementService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserRegister",
 			Handler:    _TaskManagementService_UserRegister_Handler,
+		},
+		{
+			MethodName: "SortTasks",
+			Handler:    _TaskManagementService_SortTasks_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

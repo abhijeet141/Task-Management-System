@@ -27,12 +27,12 @@ func StreamClientInterceptor(ctx context.Context,
 	streamer grpc.Streamer,
 	opts ...grpc.CallOption,
 ) (grpc.ClientStream, error) {
-	InfoLog.Printf("Opening stream for method: %s", method)
+	InfoLog.Printf("Stream successfully opened for method: %s", method)
 	clientStream, err := streamer(ctx, desc, cc, method, opts...)
 	if err != nil {
 		ErrorLog.Printf("Stream creation failed for method %s: %v", method, err)
 		return nil, err
 	}
-	InfoLog.Printf("Stream successfully opened for method: %s", method)
+	InfoLog.Printf("Stream successfully closed for method: %s", method)
 	return &Wrapper{ClientStream: clientStream, method: method}, err
 }

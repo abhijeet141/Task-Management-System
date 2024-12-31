@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github/grpc-server/Interceptor"
 	pb "github/grpc-server/proto/generated"
 	"os"
 	"time"
@@ -38,9 +39,16 @@ type Task struct {
 	Status      string    `orm:"column(status)"`
 	CreatedAt   time.Time `orm:"column(created_at);type(datetime)"`
 }
+type Token struct {
+	Id        int       `orm:"column(id);auto"`
+	UserId    int       `orm:"column(user_id)"`
+	JWT       string    `orm:"column(jwt)"`
+	CreatedAt time.Time `orm:"column(created_at);type(datetime)"`
+	Expired   bool      `orm:"column(expired)"`
+}
 
 func init() {
-	orm.RegisterModel(new(Task), new(User))
+	orm.RegisterModel(new(Task), new(User), new(Token))
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
@@ -64,7 +72,7 @@ func main() {
 		log.Fatalf("Failed to start the server %v", err)
 	}
 	log.Println("APP started and running on PORT 8080")
-	grpcserver := grpc.NewServer()
+	grpcserver := grpc.NewServer(grpc.UnaryInterceptor(Interceptor.UnaryServerInterceptor), grpc.StreamInterceptor(Interceptor.StreamServerInterceptor))
 	pb.RegisterTaskManagementServiceServer(grpcserver, &TaskManagementServer{})
 	err = grpcserver.Serve(lis)
 	if err != nil {

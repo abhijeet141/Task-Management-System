@@ -71,7 +71,7 @@ func LoginUserController(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	_, err = client.UserLogin(ctx, userDetails)
+	Userid, err := client.UserLogin(ctx, userDetails)
 	if err != nil {
 		http.Error(w, "Invalid login", http.StatusUnauthorized)
 		return
@@ -84,6 +84,14 @@ func LoginUserController(w http.ResponseWriter, r *http.Request) {
 	refresh_token, err := GenerateRefresh(userDetails.UserName)
 	if err != nil {
 		http.Error(w, "Error generating refresh token", http.StatusInternalServerError)
+		return
+	}
+	tokenInfo := &pb.Token{UserId: Userid.Id,
+		Jwt:     refresh_token,
+		Expired: false}
+	_, err = client.RefreshToken(ctx, tokenInfo)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to add token: %v", err), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

@@ -8,7 +8,7 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-func (t *TaskManagementServer) UserLogin(ctx context.Context, req *pb.UserInfo) (*pb.Message, error) {
+func (t *TaskManagementServer) UserLogin(ctx context.Context, req *pb.UserInfo) (*pb.UserId, error) {
 	o := orm.NewOrm()
 	userName := User{EmailAddress: req.UserName}
 	err := o.Read(&userName, "email_address")
@@ -18,7 +18,5 @@ func (t *TaskManagementServer) UserLogin(ctx context.Context, req *pb.UserInfo) 
 	if userName.Password != req.Password {
 		return nil, fmt.Errorf("invalid password")
 	}
-	return &pb.Message{
-		Message: "Login successful",
-	}, nil
+	return &pb.UserId{Id: uint64(userName.Id)}, nil
 }

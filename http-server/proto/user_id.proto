@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option go_package = './proto/generated';
+
+package proto;
+
+message UserId{
+    uint64 Id = 1;
+}

@@ -12,6 +12,8 @@ import "proto/task_list.proto";
 import "proto/user.proto";
 import "proto/user_info.proto";
 import "proto/sort_task.proto";
+import "proto/refresh_token.proto";
+import "proto/user_id.proto";
 
 service TaskManagementService{
     rpc CreateTask (Task) returns (Message);
@@ -21,7 +23,8 @@ service TaskManagementService{
     rpc GetTaskById (TaskId) returns (Task);
     rpc UpdateTaskById (Task) returns (Task);
     rpc DeleteTaskById (TaskId) returns (Message);
-    rpc UserLogin (UserInfo) returns (Message);
+    rpc UserLogin (UserInfo) returns (UserId);
     rpc UserRegister (User) returns (Message);
     rpc SortTasks(SortTasksRequest) returns (TaskList);
+    rpc RefreshToken(Token) returns (Message);
 }

@@ -29,6 +29,7 @@ const (
 	TaskManagementService_UserLogin_FullMethodName      = "/proto.TaskManagementService/UserLogin"
 	TaskManagementService_UserRegister_FullMethodName   = "/proto.TaskManagementService/UserRegister"
 	TaskManagementService_SortTasks_FullMethodName      = "/proto.TaskManagementService/SortTasks"
+	TaskManagementService_RefreshToken_FullMethodName   = "/proto.TaskManagementService/RefreshToken"
 )
 
 // TaskManagementServiceClient is the client API for TaskManagementService service.
@@ -42,9 +43,10 @@ type TaskManagementServiceClient interface {
 	GetTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
 	UpdateTaskById(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Task, error)
 	DeleteTaskById(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Message, error)
-	UserLogin(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*Message, error)
+	UserLogin(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*UserId, error)
 	UserRegister(ctx context.Context, in *User, opts ...grpc.CallOption) (*Message, error)
 	SortTasks(ctx context.Context, in *SortTasksRequest, opts ...grpc.CallOption) (*TaskList, error)
+	RefreshToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Message, error)
 }
 
 type taskManagementServiceClient struct {
@@ -131,9 +133,9 @@ func (c *taskManagementServiceClient) DeleteTaskById(ctx context.Context, in *Ta
 	return out, nil
 }
 
-func (c *taskManagementServiceClient) UserLogin(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*Message, error) {
+func (c *taskManagementServiceClient) UserLogin(ctx context.Context, in *UserInfo, opts ...grpc.CallOption) (*UserId, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Message)
+	out := new(UserId)
 	err := c.cc.Invoke(ctx, TaskManagementService_UserLogin_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -161,6 +163,16 @@ func (c *taskManagementServiceClient) SortTasks(ctx context.Context, in *SortTas
 	return out, nil
 }
 
+func (c *taskManagementServiceClient) RefreshToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*Message, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Message)
+	err := c.cc.Invoke(ctx, TaskManagementService_RefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskManagementServiceServer is the server API for TaskManagementService service.
 // All implementations must embed UnimplementedTaskManagementServiceServer
 // for forward compatibility.
@@ -172,9 +184,10 @@ type TaskManagementServiceServer interface {
 	GetTaskById(context.Context, *TaskId) (*Task, error)
 	UpdateTaskById(context.Context, *Task) (*Task, error)
 	DeleteTaskById(context.Context, *TaskId) (*Message, error)
-	UserLogin(context.Context, *UserInfo) (*Message, error)
+	UserLogin(context.Context, *UserInfo) (*UserId, error)
 	UserRegister(context.Context, *User) (*Message, error)
 	SortTasks(context.Context, *SortTasksRequest) (*TaskList, error)
+	RefreshToken(context.Context, *Token) (*Message, error)
 	mustEmbedUnimplementedTaskManagementServiceServer()
 }
 
@@ -206,7 +219,7 @@ func (UnimplementedTaskManagementServiceServer) UpdateTaskById(context.Context, 
 func (UnimplementedTaskManagementServiceServer) DeleteTaskById(context.Context, *TaskId) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTaskById not implemented")
 }
-func (UnimplementedTaskManagementServiceServer) UserLogin(context.Context, *UserInfo) (*Message, error) {
+func (UnimplementedTaskManagementServiceServer) UserLogin(context.Context, *UserInfo) (*UserId, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserLogin not implemented")
 }
 func (UnimplementedTaskManagementServiceServer) UserRegister(context.Context, *User) (*Message, error) {
@@ -214,6 +227,9 @@ func (UnimplementedTaskManagementServiceServer) UserRegister(context.Context, *U
 }
 func (UnimplementedTaskManagementServiceServer) SortTasks(context.Context, *SortTasksRequest) (*TaskList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SortTasks not implemented")
+}
+func (UnimplementedTaskManagementServiceServer) RefreshToken(context.Context, *Token) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
 }
 func (UnimplementedTaskManagementServiceServer) mustEmbedUnimplementedTaskManagementServiceServer() {}
 func (UnimplementedTaskManagementServiceServer) testEmbeddedByValue()                               {}
@@ -394,6 +410,24 @@ func _TaskManagementService_SortTasks_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskManagementService_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskManagementServiceServer).RefreshToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TaskManagementService_RefreshToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskManagementServiceServer).RefreshToken(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskManagementService_ServiceDesc is the grpc.ServiceDesc for TaskManagementService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -432,6 +466,10 @@ var TaskManagementService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SortTasks",
 			Handler:    _TaskManagementService_SortTasks_Handler,
+		},
+		{
+			MethodName: "RefreshToken",
+			Handler:    _TaskManagementService_RefreshToken_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

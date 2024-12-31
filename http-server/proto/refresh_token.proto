@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = './proto/generated';
+
+package proto;
+
+import "google/protobuf/timestamp.proto";
+
+
+message Token{
+    uint64 Id = 1;                                      // @gotags: orm:"pk;column(id);auto"                        json:"id"
+    uint64 userId = 2;                                  // @gotags: orm:"column(user_id)"                           json:"user_id"
+    string jwt = 3;                                     // @gotags: orm:"column(jwt)"                               json:"jwt"
+    google.protobuf.Timestamp createdAt = 4;            // @gotags: orm:"column(createdAt);timestamp"               json:"created_at"
+    bool Expired = 5;                                   // @gotags: orm:"column(expired)"                           json:"expired"
+}

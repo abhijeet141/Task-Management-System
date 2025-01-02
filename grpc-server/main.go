@@ -20,7 +20,7 @@ const (
 )
 
 type TaskManagementServer struct {
-	pb.TaskManagementServiceServer
+	pb.UnimplementedTaskManagementServiceServer
 }
 
 type User struct {

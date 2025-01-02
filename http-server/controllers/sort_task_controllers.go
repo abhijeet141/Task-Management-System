@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	grpcclient "github/http-server/grpc-client"
 	pb "github/http-server/proto/generated"
 	"log"
@@ -13,10 +12,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type Task struct {
+	Id          int       `orm:"column(id);auto"`
+	UserId      int       `orm:"column(user_id)"`
+	Title       string    `orm:"column(title)"`
+	Description string    `orm:"column(description)"`
+	Status      string    `orm:"column(status)"`
+	CreatedAt   time.Time `orm:"column(created_at);type(datetime)"`
+}
+
 func SortTasksControllers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	sortBy := vars["sortBy"]
-	if sortBy != "status" && sortBy != "created_at" {
+	if sortBy != "Status" && sortBy != "CreatedAt" && sortBy != "Title" && sortBy != "Id" {
 		http.Error(w, "Invalid sort criteria", http.StatusBadRequest)
 		return
 	}
@@ -32,10 +40,10 @@ func SortTasksControllers(w http.ResponseWriter, r *http.Request) {
 	}
 	istLocation, err := time.LoadLocation("Asia/Kolkata")
 	if err != nil {
-		http.Error(w, "error loading location %v", http.StatusInternalServerError)
+		http.Error(w, "Error loading location %v", http.StatusInternalServerError)
 		return
 	}
-	tasks := map[string]interface{}{}
+	var Tasks []Task
 	for _, task := range res.Task {
 		createdTime := task.CreatedAt.AsTime().In(istLocation).Format("2006-01-02 15:04:05")
 		parsedTime, err := time.Parse("2006-01-02 15:04:05", createdTime)
@@ -43,14 +51,16 @@ func SortTasksControllers(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "error parsing formatted time", http.StatusInternalServerError)
 			return
 		}
-		tasks[fmt.Sprintf("%d", task.Id)] = map[string]interface{}{
-			"title":       task.Title,
-			"description": task.Description,
-			"status":      task.Status,
-			"created_at":  parsedTime,
+		Task := Task{
+			Id:          int(task.Id),
+			Title:       task.Title,
+			Description: task.Description,
+			Status:      task.Status,
+			CreatedAt:   parsedTime,
 		}
+		Tasks = append(Tasks, Task)
 	}
-	response, err := json.MarshalIndent(tasks, "", "\t")
+	response, err := json.MarshalIndent(Tasks, "", "\t")
 	if err != nil {
 		log.Fatalf("Error marshalling JSON: %v", err)
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github/grpc-server/Reflection"
 	pb "github/grpc-server/proto/generated"
 
 	"github.com/beego/beego/v2/client/orm"
@@ -13,14 +14,17 @@ func (t *TaskManagementServer) SortTasks(ctx context.Context, req *pb.SortTasksR
 	o := orm.NewOrm()
 	sortBy := req.SortBy
 	if sortBy == "" {
-		sortBy = "created_at"
+		sortBy = "Id"
 	}
 	var tasks []Task
-	_, err := o.QueryTable("task").OrderBy(sortBy).All(&tasks)
+	_, err := o.QueryTable("task").All(&tasks)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(tasks)
+	err = Reflection.DynamicSort(&tasks, sortBy)
+	if err != nil {
+		return nil, fmt.Errorf("error in sorting")
+	}
 	var pbTasks []*pb.Task
 	for _, task := range tasks {
 		pbTask := &pb.Task{

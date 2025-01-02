@@ -14,6 +14,7 @@ import "proto/user_info.proto";
 import "proto/sort_task.proto";
 import "proto/refresh_token.proto";
 import "proto/user_id.proto";
+import "proto/filter_task.proto";
 
 service TaskManagementService{
     rpc CreateTask (Task) returns (Message);
@@ -27,4 +28,5 @@ service TaskManagementService{
     rpc UserRegister (User) returns (Message);
     rpc SortTasks(SortTasksRequest) returns (TaskList);
     rpc RefreshToken(Token) returns (Message);
+    rpc FilterTasks(FilterTasksRequest) returns (TaskList);
 }

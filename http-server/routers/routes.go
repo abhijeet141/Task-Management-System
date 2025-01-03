@@ -27,6 +27,6 @@ func SetupRouter() *mux.Router {
 	authenticatedRouter.HandleFunc("/task/{id}", controllers.UpdateTaskByIdController).Methods("PUT")
 
 	authenticatedRouter.HandleFunc("/task/sort/{sortBy}", controllers.SortTasksControllers).Methods("GET")
-	authenticatedRouter.HandleFunc("/task/filter/{filterBy}", controllers.FilterTaskController).Methods("GET")
+	// authenticatedRouter.HandleFunc("/task/filter/{filterBy}", controllers.FilterTaskController).Methods("GET")
 	return router
 }
